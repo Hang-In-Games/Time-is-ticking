@@ -14,8 +14,7 @@
 ### 1. Unity 태그 설정
 Unity 에디터에서 다음 태그들을 생성하세요:
 - `Ball` (공)
-- `HourHand` (시침)
-- `MinuteHand` (분침)
+- `ClockHand` (시침/분침 - 하나의 태그로 통일)
 
 **태그 생성 방법:**
 1. Unity 에디터 상단: `Edit > Project Settings > Tags and Layers`
@@ -56,15 +55,48 @@ GameObject: Ball
 - CircleCollider2D (충돌 감지)
 ```
 
-#### 시침 (HourHand)
+#### 시침 (HourHand) & 분침 (MinuteHand)
 ```
 GameObject: HourHand
-- Tag: "HourHand"
+- Tag: "ClockHand"
+- Rigidbody2D (선택사항)
+- BoxCollider2D 또는 CapsuleCollider2D
+
+GameObject: MinuteHand
+- Tag: "ClockHand"
 - Rigidbody2D (선택사항)
 - BoxCollider2D 또는 CapsuleCollider2D
 ```
 
+**ClockHandController 추가:**
+GameManager GameObject에 `ClockHandController` 스크립트도 추가:
+- **Hour Hand**: HourHand GameObject 할당
+- **Minute Hand**: MinuteHand GameObject 할당
+- **Switch Interval**: 침 전환 시간 (초) - 기본값 5초
+- **Start With Hour Hand**: 시침부터 시작할지 여부
+
 ## 💻 스크립트 설명
+
+### ClockHandController.cs
+시침과 분침을 번갈아가면서 제어하는 컨트롤러
+
+**주요 기능:**
+- 일정 시간마다 시침 ↔ 분침 자동 전환
+- 현재 활성화된 침만 게임에 참여
+- 비활성화된 침은 SetActive(false)로 숨김
+- 화면에 현재 침과 남은 시간 표시
+
+**주요 파라미터:**
+- `hourHand`: 시침 GameObject
+- `minuteHand`: 분침 GameObject
+- `switchInterval`: 전환 시간 간격 (초)
+- `startWithHourHand`: 시침부터 시작 여부
+
+**주요 메서드:**
+- `ManualSwitchHand()`: 수동으로 침 전환
+- `GetCurrentHand()`: 현재 활성화된 침 가져오기
+- `IsHourHandActive()`: 시침이 활성화되어 있는지 확인
+- `GetRemainingTime()`: 다음 전환까지 남은 시간
 
 ### CircleBoundary.cs
 개별 오브젝트에 붙어서 원형 경계를 제약하는 컴포넌트
@@ -94,6 +126,48 @@ if (오브젝트가 경계 밖에 있음)
 - `AddBoundaryConstraint(GameObject, float)`: 런타임에 새 오브젝트 추가
 
 ## 🎮 사용 예제
+
+### 침 전환 이벤트 활용하기
+```csharp
+public class ScoreManager : MonoBehaviour
+{
+    public ClockHandController handController;
+    
+    private GameObject lastActiveHand;
+    
+    void Update()
+    {
+        GameObject currentHand = handController.GetCurrentHand();
+        
+        // 침이 전환되었을 때
+        if (currentHand != lastActiveHand)
+        {
+            OnHandSwitched(currentHand);
+            lastActiveHand = currentHand;
+        }
+    }
+    
+    void OnHandSwitched(GameObject newHand)
+    {
+        Debug.Log($"침이 전환되었습니다: {newHand.name}");
+        // 점수 보너스, 효과음 재생 등
+    }
+}
+```
+
+### 특정 조건에서 수동 전환
+```csharp
+public class PowerUpController : MonoBehaviour
+{
+    public ClockHandController handController;
+    
+    void OnPowerUpCollected()
+    {
+        // 파워업 먹으면 즉시 침 전환
+        handController.ManualSwitchHand();
+    }
+}
+```
 
 ### 런타임에 공 생성하기
 ```csharp
@@ -155,8 +229,24 @@ GameManager가 Start 시 다음 정보를 출력:
 // 공은 강하게 튕기고
 ball.GetComponent<CircleBoundary>().bounciness = 0.95f;
 
-// 시침은 약하게 튕김
-hourHand.GetComponent<CircleBoundary>().bounciness = 0.5f;
+// 침은 약하게 튕김
+GameObject currentHand = handController.GetCurrentHand();
+currentHand.GetComponent<CircleBoundary>().bounciness = 0.5f;
+```
+
+### UI에 침 전환 타이머 표시
+```csharp
+public class UIManager : MonoBehaviour
+{
+    public ClockHandController handController;
+    public Text timerText;
+    
+    void Update()
+    {
+        float remaining = handController.GetRemainingTime();
+        timerText.text = $"전환까지: {remaining:F1}초";
+    }
+}
 ```
 
 ## 🐛 문제 해결
@@ -175,16 +265,21 @@ hourHand.GetComponent<CircleBoundary>().bounciness = 0.5f;
 - Start 전에 오브젝트가 생성되었는지 확인
 
 ## 📝 체크리스트
-- [ ] Unity 태그 생성 완료
+- [ ] Unity 태그 생성 완료 (`Ball`, `ClockHand`)
 - [ ] ClockCenter GameObject 생성 및 위치 설정
-- [ ] GameManager GameObject 생성 및 스크립트 추가
+- [ ] GameManager GameObject 생성
+- [ ] GameManager에 `GameManager_TimeBouncer` 스크립트 추가
+- [ ] GameManager에 `ClockHandController` 스크립트 추가
 - [ ] Clock Radius 값 설정 (SVG와 일치)
-- [ ] Ball, HourHand 등 오브젝트에 태그 설정
+- [ ] HourHand, MinuteHand GameObject 생성 및 `ClockHand` 태그 설정
+- [ ] ClockHandController에 시침/분침 할당
+- [ ] Ball GameObject 생성 및 `Ball` 태그 설정
 - [ ] Rigidbody2D 컴포넌트 추가 (물리 사용 시)
 - [ ] Scene View에서 기즈모 확인
 
 ## 🎯 다음 단계
 1. 공의 초기 속도 설정
-2. 시침/분침 회전 로직 구현
-3. 점수 시스템 추가
-4. UI 연동
+2. 침의 이동/회전 로직 구현 (플레이어 입력)
+3. 침 전환 시 시각/청각 효과 추가
+4. 점수 시스템 추가
+5. UI 연동 (타이머, 현재 침 표시)

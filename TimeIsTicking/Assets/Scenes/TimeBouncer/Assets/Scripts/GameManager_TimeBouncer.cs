@@ -15,7 +15,7 @@ public class GameManager_TimeBouncer : MonoBehaviour
     
     [Header("Boundary Object Tags")]
     [Tooltip("원형 경계 제약을 받을 오브젝트의 태그들")]
-    public string[] boundaryTags = new string[] { "Ball", "HourHand", "MinuteHand" };
+    public string[] boundaryTags = new string[] { "Ball", "Paddle" };
     
     [Header("Boundary Settings")]
     [Tooltip("경계에서 튕기기 활성화")]
