@@ -11,7 +11,7 @@ public class TimeEventDefine : ScriptableObject
 {
     public TimeEventType timeEventType;
     public string targetName;
-
+    
     private bool _isTrigger;
     public bool IsTrigger => _isTrigger;
     public void Trigger() =>_isTrigger = true;

@@ -1,3 +1,5 @@
+// csharp
+// Assets/Script/Game/DigitalClock.cs
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +27,7 @@ public class DigitalClock : MonoBehaviour
     private float elapsedSeconds, StartElapsedSeconds;
     private float loopTriggerElapsedTime;
     private bool isPaused = false;
+    private bool loopEnabled = true;
     
     public Action OnReset;
     public float ElapsedTime => elapsedSeconds;
@@ -45,11 +48,20 @@ public class DigitalClock : MonoBehaviour
         // 시간 흘러감
         elapsedSeconds += Time.deltaTime;
 
-        // 루프 처리
+        // 루프 처리 (루프 비활성화 시에는 리셋/OnReset 호출 없음)
         if (elapsedSeconds >= loopTriggerElapsedTime)
         {
-            elapsedSeconds = StartElapsedSeconds;
-            OnReset?.Invoke();
+            if (loopEnabled)
+            {
+                elapsedSeconds = StartElapsedSeconds;
+                loopTriggerElapsedTime = elapsedSeconds + loopDuration;
+                OnReset?.Invoke();
+            }
+            else
+            {
+                // 루프 비활성화 상태면 더 이상 트리거되지 않도록 큰 값 설정
+                loopTriggerElapsedTime = float.PositiveInfinity;
+            }
         }
         // 디지털 시계 표시
         int hours = (int)(elapsedSeconds / 3600) % 24;
@@ -72,4 +84,16 @@ public class DigitalClock : MonoBehaviour
         if(pauseReasons.Any(e=>e == reason) == false)
             isPaused = false;
     }
+
+    public void DisableLoop()
+    {
+        loopEnabled = false;
+    }
+
+    public void EnableLoop()
+    {
+        loopEnabled = true;
+    }
+
+    public bool IsLoopEnabled() => loopEnabled;
 }
