@@ -143,6 +143,7 @@ public class ScoreSystemDebugger : MonoBehaviour
         }
     }
     
+#if UNITY_EDITOR
     /// <summary>
     /// Gizmo로 시각적 디버그 정보 표시
     /// </summary>
@@ -176,4 +177,5 @@ public class ScoreSystemDebugger : MonoBehaviour
             }
         }
     }
+#endif
 }

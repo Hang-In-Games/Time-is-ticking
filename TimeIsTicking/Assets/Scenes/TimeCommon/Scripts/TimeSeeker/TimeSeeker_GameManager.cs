@@ -444,6 +444,8 @@ public class TimeSeeker_GameManager : GameManagerBase
         }
     }
     
+
+#if UNITY_EDITOR
     /// <summary>
     /// TimeSeeker 전용 디버그 기즈모
     /// </summary>
@@ -478,4 +480,5 @@ public class TimeSeeker_GameManager : GameManagerBase
             }
         }
     }
+#endif
 }

@@ -382,6 +382,8 @@ public class TimeBouncer_GameManager : GameManagerBase
         }
     }
     
+
+#if UNITY_EDITOR
     /// <summary>
     /// TimeBouncer 전용 디버그 기즈모
     /// </summary>
@@ -413,6 +415,7 @@ public class TimeBouncer_GameManager : GameManagerBase
             Gizmos.DrawLine(center, paddleEnd);
         }
     }
+#endif
     
     protected override void OnDestroy()
     {

@@ -391,6 +391,7 @@ public class ScoreManager : MonoBehaviour
         return item;
     }
     
+#if UNITY_EDITOR
     /// <summary>
     /// 디버그용 기즈모
     /// </summary>
@@ -422,6 +423,7 @@ public class ScoreManager : MonoBehaviour
             prevPoint = newPoint;
         }
     }
+#endif
     
     // 공개 속성들
     public int CurrentScore => currentScore;

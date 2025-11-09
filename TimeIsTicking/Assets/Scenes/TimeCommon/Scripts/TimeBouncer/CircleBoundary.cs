@@ -155,6 +155,7 @@ public class CircleBoundary : MonoBehaviour
         }
     }
 
+#if UNITY_EDITOR
     // 디버그용 기즈모
     void OnDrawGizmos()
     {
@@ -187,4 +188,5 @@ public class CircleBoundary : MonoBehaviour
             prevPoint = newPoint;
         }
     }
+#endif
 }

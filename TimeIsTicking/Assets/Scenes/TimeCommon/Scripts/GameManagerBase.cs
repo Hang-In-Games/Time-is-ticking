@@ -671,6 +671,7 @@ public abstract class GameManagerBase : MonoBehaviour
         Debug.Log($"{gameType}: Input System 수동 설정 완료: {asset?.name ?? "null"}");
     }
     
+#if UNITY_EDITOR
     /// <summary>
     /// 디버그용 기즈모 (공통)
     /// </summary>
@@ -698,6 +699,7 @@ public abstract class GameManagerBase : MonoBehaviour
             prevPoint = newPoint;
         }
     }
+#endif
     
     protected virtual void OnDestroy()
     {
