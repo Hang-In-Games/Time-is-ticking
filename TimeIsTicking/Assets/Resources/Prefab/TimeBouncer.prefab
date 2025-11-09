@@ -274,7 +274,7 @@ MonoBehaviour:
   inputActionAsset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   usePlayerInput: 1
   clockRadius: 3.8
-  usePrefabMode: 0
+  usePrefabMode: 1
   useParentControl: 0
   useCameraAutoSetup: 0
   scoreText: {fileID: 0}

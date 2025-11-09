@@ -129,6 +129,21 @@ public class TimeSeeker_GameManager : GameManagerBase
         
         InitializeGame();
     }
+
+    /// <summary>
+    /// StartMiniGame 오버라이드 - 프리팹 모드에서 첫 오브젝트 생성
+    /// </summary>
+    public override void StartMiniGame()
+    {
+        base.StartMiniGame();
+
+        // 프리팹 모드에서 게임 시작 시 첫 오브젝트 생성
+        if (usePrefabMode && activeObjects.Count == 0)
+        {
+            Debug.Log($"{gameType}: 프리팹 모드 - 첫 오브젝트 생성");
+            SpawnRandomObject();
+        }
+    }
     
     /// <summary>
     /// TimeSeeker 전용 참조 검증

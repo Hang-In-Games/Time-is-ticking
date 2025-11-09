@@ -128,6 +128,21 @@ public class TimeBouncer_GameManager : GameManagerBase
         }
     }
     
+    /// <summary>
+    /// StartMiniGame 오버라이드 - 프리팹 모드에서 공 초기화
+    /// </summary>
+    public override void StartMiniGame()
+    {
+        base.StartMiniGame();
+        
+        // 프리팹 모드에서 게임 시작 시 공의 속도를 다시 설정
+        if (usePrefabMode)
+        {
+            Debug.Log($"{gameType}: 프리팹 모드 - 공 속도 재설정");
+            InitializeBall(ballScoreTriggerDistanceThreshold);
+        }
+    }
+    
 
     
     
@@ -202,6 +217,11 @@ public class TimeBouncer_GameManager : GameManagerBase
             Vector2 direction = Random.insideUnitCircle.normalized;
             ballRb.linearVelocity = direction * ballInitialSpeed;
             
+            Debug.Log($"TimeBouncer: Ball 초기화 - 속도: {ballRb.linearVelocity.magnitude:F1}, 방향: {direction}");
+        }
+        else
+        {
+            Debug.LogWarning("TimeBouncer: ballRb가 null입니다!");
         }
     }
     
@@ -277,8 +297,21 @@ public class TimeBouncer_GameManager : GameManagerBase
     /// </summary>
     void OnTargetScoreReached(int finalScore)
     {
+        Debug.Log($"========================================");
+        Debug.Log($"TimeBouncer: ⭐ OnTargetScoreReached 호출됨!");
+        Debug.Log($"  - finalScore: {finalScore}");
+        Debug.Log($"  - currentScore(이전): {currentScore}");
+        
         currentScore = finalScore;
-        OnGameEnd();
+        Debug.Log($"  - currentScore(변경후): {currentScore}");
+        Debug.Log($"  - hasEnded: {hasEnded}");
+        Debug.Log($"  - isRunning: {isRunning}");
+        
+        // 게임 클리어 처리 (베이스 클래스의 OnTargetScoreReached 호출)
+        Debug.Log($"TimeBouncer: base.OnTargetScoreReached() 호출 시작...");
+        base.OnTargetScoreReached();
+        Debug.Log($"TimeBouncer: base.OnTargetScoreReached() 호출 완료!");
+        Debug.Log($"========================================");
     }
     
     /// <summary>
