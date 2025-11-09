@@ -1053,7 +1053,7 @@ MonoBehaviour:
   _maxValue: 100
   _initialValue: 20
   _increasePerMash: 2
-  _decreasePerSecond: 1
+  _decreasePerSecond: 10
   _mashSound: {fileID: 1423397433588869028}
 --- !u!1 &6705902959129186542
 GameObject:

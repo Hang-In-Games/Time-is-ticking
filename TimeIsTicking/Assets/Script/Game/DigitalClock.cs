@@ -31,6 +31,7 @@ public class DigitalClock : MonoBehaviour
     private bool loopEnabled = true;
     
     public Action OnReset;
+    public Action OnClear;
     public float ElapsedTime => elapsedSeconds;
     public float ElapsedTimeAfterStart => elapsedSeconds - StartElapsedSeconds;
     
@@ -48,21 +49,19 @@ public class DigitalClock : MonoBehaviour
         
         // 시간 흘러감
         elapsedSeconds += Time.deltaTime;
-
-        Debug.LogError($"{elapsedSeconds} / {loopTriggerElapsedTime} / {loopEnabled}");
-
+        
         // 루프 처리 (루프 비활성화 시에는 리셋/OnReset 호출 없음)
         if (elapsedSeconds >= loopTriggerElapsedTime)
         {
             if (loopEnabled)
             {
-                Debug.LogError("shit");
                 OnReset?.Invoke();
             }
             else
             {
                 // 루프 비활성화 상태면 더 이상 트리거되지 않도록 큰 값 설정
                 loopTriggerElapsedTime = float.PositiveInfinity;
+                OnClear?.Invoke();
             }
         }
         // 디지털 시계 표시
