@@ -9,6 +9,8 @@ using UnityEngine.SceneManagement;
 public enum GimmickType
 {
     MashMiniGame,
+    TimeBouncer,
+    TimeSeeker,
 }
 public class GameManager : MonoBehaviour
 {

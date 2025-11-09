@@ -12,6 +12,9 @@ using UnityEngine;
 /// </summary>
 public class TimeSeeker_GameManager : GameManagerBase
 {
+    // IMiniGame 인터페이스 구현
+    public override GimmickType GimmickType => GimmickType.TimeSeeker;
+    
     [Header("TimeSeeker Scene Objects")]
     [Tooltip("바늘 (시침)")]
     public GameObject needle;

@@ -15,6 +15,9 @@ using UnityEngine;
 /// </summary>
 public class TimeBouncer_GameManager : GameManagerBase
 {
+    // IMiniGame 인터페이스 구현
+    public override GimmickType GimmickType => GimmickType.TimeBouncer;
+    
     [Header("TimeBouncer Scene Objects")]
     [Tooltip("플레이어 패들 (시침)")]
     public GameObject paddle;

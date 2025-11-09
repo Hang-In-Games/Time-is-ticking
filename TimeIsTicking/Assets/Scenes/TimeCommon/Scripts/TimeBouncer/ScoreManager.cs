@@ -29,8 +29,8 @@ public class ScoreManager : MonoBehaviour
     
     [Header("Collision Distance Settings")]
     [Tooltip("모든 ScoreItem의 트리거 거리 배수 (기본값 오버라이드)")]
-    [Range(0.5f, 3.0f)]
-    public float globalTriggerDistanceMultiplier = 1.2f;
+    [Range(0.01f, 1.0f)]
+    public float globalTriggerDistanceMultiplier = 0.05f;
     
     [Tooltip("모든 ScoreItem의 고정 여유 거리 (기본값 오버라이드)")]
     [Range(0f, 2f)]

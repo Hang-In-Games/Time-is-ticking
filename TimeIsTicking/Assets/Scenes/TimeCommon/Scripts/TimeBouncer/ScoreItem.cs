@@ -104,9 +104,8 @@ public class ScoreItem : MonoBehaviour
     {
         float baseRadius = GetEffectiveColliderRadius();
         float maxDistance = (baseRadius * maxTriggerDistanceMultiplier) + fixedMarginDistance;
-        
-        // 최소 거리 보장 (너무 작으면 충돌이 어려움)
-        return Mathf.Max(maxDistance, 0.5f);
+
+        return maxDistance;
     }
     
     /// <summary>
