@@ -233,10 +233,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
   currentScore: 0
-  targetScore: 10
-  spawnInterval: 3
-  maxActiveItems: 3
-  spawnRadius: 1.1
+  targetScore: 50
+  spawnInterval: 2
+  maxActiveItems: 10
+  spawnRadius: 3.5
   spawnMinRadius: 0.5
   globalTriggerDistanceMultiplier: 1
   globalFixedMarginDistance: 0.3
@@ -273,8 +273,8 @@ MonoBehaviour:
   clockBorder: {fileID: 2123637788726745652}
   inputActionAsset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   usePlayerInput: 1
-  clockRadius: 1.25
-  usePrefabMode: 1
+  clockRadius: 3.8
+  usePrefabMode: 0
   useParentControl: 0
   useCameraAutoSetup: 0
   scoreText: {fileID: 0}
@@ -292,7 +292,7 @@ MonoBehaviour:
   gameType: 
   paddle: {fileID: 4474899010812305209}
   ball: {fileID: 7572313901484789817}
-  paddleRotationSpeed: 360
+  paddleRotationSpeed: 120
   ballInitialSpeed: 5
   ballMinSpeed: 5
   ballMaxSpeed: 10
@@ -449,7 +449,7 @@ Transform:
   m_GameObject: {fileID: 4474899010812305209}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.4}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -765,6 +765,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ball
       objectReference: {fileID: 0}
+    - target: {fileID: 4150754453477482856, guid: cebb60dc9684b904389143a10cd29a4d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 6858494984922289481, guid: cebb60dc9684b904389143a10cd29a4d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -775,7 +779,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6858494984922289481, guid: cebb60dc9684b904389143a10cd29a4d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6858494984922289481, guid: cebb60dc9684b904389143a10cd29a4d, type: 3}
       propertyPath: m_LocalRotation.w
