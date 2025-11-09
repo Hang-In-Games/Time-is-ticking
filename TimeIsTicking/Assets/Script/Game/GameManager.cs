@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         // 시간 이벤트 처리
-        if (_clock == null || _timeEventCollection == null) return;
+        if (_clock == null || _timeEventCollection == null || _clock.IsPaused) return;
 
         int currentTime = Mathf.FloorToInt(_clock.ElapsedTimeAfterStart);
         foreach (var kv in _timeEventCollection.timeEventDefineDictionary)

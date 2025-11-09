@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class TimeEventTarget : MonoBehaviour
@@ -20,5 +21,10 @@ public class TimeEventTarget : MonoBehaviour
             gameObject.SetActive(false);
             break;
       }
+   }
+
+   private void OnEnable()
+   {
+      Debug.LogError("shit");
    }
 }

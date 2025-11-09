@@ -32,6 +32,7 @@ public class DigitalClock : MonoBehaviour
     
     public Action OnReset;
     public Action OnClear;
+    public bool IsPaused => isPaused;
     public float ElapsedTime => elapsedSeconds;
     public float ElapsedTimeAfterStart => elapsedSeconds - StartElapsedSeconds;
     
