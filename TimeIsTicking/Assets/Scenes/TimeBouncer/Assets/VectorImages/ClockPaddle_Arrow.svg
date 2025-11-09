@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="40" viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Clock Paddle (Arrow Shape) - White, pivot at left end -->
+  <!-- Arrow-shaped paddle for better direction indication -->
+  
+  <!-- Arrow shaft (rectangle) -->
+  <rect 
+    x="5" 
+    y="14" 
+    width="150" 
+    height="12" 
+    fill="white" 
+    rx="2"/>
+  
+  <!-- Arrow head (triangle) -->
+  <polygon 
+    points="150,8 150,32 180,20" 
+    fill="white"/>
+  
+  <!-- Base circle (pivot point) -->
+  <circle 
+    cx="5" 
+    cy="20" 
+    r="10" 
+    fill="white"/>
+</svg>
