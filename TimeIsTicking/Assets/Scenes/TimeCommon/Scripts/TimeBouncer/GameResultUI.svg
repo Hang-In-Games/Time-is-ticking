@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <!-- 반투명 배경 -->
+  <rect width="400" height="300" 
+        fill="#000000" 
+        opacity="0.7"/>
+  
+  <!-- SUCCESS 메시지 -->
+  <g id="success-message" style="display: none;">
+    <!-- 성공 배경 원형 -->
+    <circle cx="200" cy="150" r="120" 
+            fill="#4CAF50" 
+            opacity="0.9"/>
+    
+    <!-- 체크마크 -->
+    <path d="M160 150 L180 170 L240 110" 
+          stroke="#ffffff" 
+          stroke-width="8" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          fill="none"/>
+    
+    <!-- SUCCESS 텍스트 -->
+    <text x="200" y="220" 
+          font-family="Arial, sans-serif" 
+          font-size="36" 
+          font-weight="bold" 
+          fill="#ffffff" 
+          text-anchor="middle">SUCCESS</text>
+    
+    <!-- 축하 메시지 -->
+    <text x="200" y="250" 
+          font-family="Arial, sans-serif" 
+          font-size="16" 
+          fill="#ccffcc" 
+          text-anchor="middle">Time Goal Achieved!</text>
+  </g>
+  
+  <!-- FAIL 메시지 -->
+  <g id="fail-message" style="display: none;">
+    <!-- 실패 배경 원형 -->
+    <circle cx="200" cy="150" r="120" 
+            fill="#f44336" 
+            opacity="0.9"/>
+    
+    <!-- X 마크 -->
+    <path d="M160 110 L240 190 M240 110 L160 190" 
+          stroke="#ffffff" 
+          stroke-width="8" 
+          stroke-linecap="round" 
+          fill="none"/>
+    
+    <!-- FAIL 텍스트 -->
+    <text x="200" y="220" 
+          font-family="Arial, sans-serif" 
+          font-size="36" 
+          font-weight="bold" 
+          fill="#ffffff" 
+          text-anchor="middle">FAIL</text>
+    
+    <!-- 실패 메시지 -->
+    <text x="200" y="250" 
+          font-family="Arial, sans-serif" 
+          font-size="16" 
+          fill="#ffcccc" 
+          text-anchor="middle">Time Up! Try Again</text>
+  </g>
+  
+  <!-- 재시작 버튼 힌트 -->
+  <text x="200" y="280" 
+        font-family="Arial, sans-serif" 
+        font-size="14" 
+        fill="#ffffff" 
+        text-anchor="middle" 
+        opacity="0.8">Press R to Restart</text>
+</svg>

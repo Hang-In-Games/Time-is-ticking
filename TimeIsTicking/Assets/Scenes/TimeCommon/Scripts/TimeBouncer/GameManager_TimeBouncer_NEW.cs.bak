@@ -1,0 +1,632 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+/// <summary>
+/// TimeBouncer 게임 메인 매니저
+/// GameManagerBase를 상속하여 TimeBouncer 게임 특화 기능 구현
+/// 
+/// 주요 기능:
+/// - 중앙 관리 시스템 (모든 오브젝트를 Inspector에서 할당)
+/// - Ball 물리 시뮬레이션 및 속도 관리
+/// - Paddle 회전 제어
+/// - 스코어 시스템 통합
+/// - 타이머 시스템 통합
+/// - 게임 상태 관리 (진행/일시정지/종료)
+/// </summary>
+public class GameManager_TimeBouncer : GameManagerBase
+{
+    [Header("=== TimeBouncer Game Objects ===")]
+    [Tooltip("플레이어 시침 (Paddle)")]
+    public GameObject paddle;
+    
+    [Tooltip("게임 볼")]
+    public GameObject ball;
+    
+    [Header("=== TimeBouncer Paddle Settings ===")]
+    [Tooltip("시침 회전 속도 (도/초)")]
+    public float paddleRotationSpeed = 180f;
+    
+    [Header("=== TimeBouncer Ball Settings ===")]
+    [Tooltip("Ball 초기 속도")]
+    public float ballInitialSpeed = 300f;
+    
+    [Tooltip("Ball 최소 속도")]
+    public float ballMinSpeed = 250f;
+    
+    [Tooltip("Ball 최대 속도")]
+    public float ballMaxSpeed = 500f;
+    
+    [Tooltip("속도 감쇄율 (0: 감쇄없음, 1: 빠른감쇄)")]
+    [Range(0f, 1f)]
+    public float speedDecayRate = 0.02f;
+    
+    [Tooltip("경계 반발력")]
+    [Range(0f, 2f)]
+    public float boundaryBounciness = 1.0f;
+    
+    [Header("=== TimeBouncer Systems ===")]
+    [Tooltip("스코어 매니저")]
+    public ScoreManager scoreManager;
+    
+    [Tooltip("타이머 매니저")]
+    public TimerManager timerManager;
+    
+    // 게임 상태
+    public enum GameState
+    {
+        Ready,      // 게임 준비
+        Playing,    // 게임 진행
+        Paused,     // 일시정지
+        GameOver    // 게임 종료
+    }
+    
+    [Header("=== Game State (Runtime) ===")]
+    [SerializeField] private GameState currentGameState = GameState.Ready;
+    
+    // 내부 참조
+    private Rigidbody2D ballRb;
+    private Vector2 ballStartPosition;
+    private Rigidbody2D paddleRb;
+    private ClockBorderColliderSetup borderSetup;
+    
+    // 디버그 정보
+    [Header("=== Debug Info ===")]
+    [SerializeField] private float currentBallSpeed = 0f;
+    [SerializeField] private float paddleAngularVelocity = 0f;
+    [SerializeField] private int totalCollisions = 0;
+    
+    protected override void InitializeGameSpecific()
+    {
+        Debug.Log("=== TimeBouncer 게임 초기화 시작 ===");
+        
+        ValidateTimBouncerReferences();
+        SetupBall();
+        SetupPaddle();
+        SetupBoundary();
+        SetupScoreSystem();
+        SetupTimerSystem();
+        
+        // 게임 시작
+        StartGame();
+        
+        Debug.Log("=== TimeBouncer 게임 초기화 완료 ===");
+    }
+    
+    protected override void UpdateGameSpecific()
+    {
+        if (currentGameState != GameState.Playing) return;
+        
+        MaintainBallSpeed();
+        UpdateDebugInfo();
+    }
+    
+    protected override void HandleGameSpecificInput()
+    {
+        if (currentGameState != GameState.Playing) return;
+        
+        float input = ReadInputValue();
+        RotatePaddle(input);
+    }
+    
+    protected override void OnGameEndSpecific()
+    {
+        SetGameState(GameState.GameOver);
+        
+        // Ball 정지
+        if (ballRb != null)
+        {
+            ballRb.linearVelocity = Vector2.zero;
+            ballRb.angularVelocity = 0f;
+        }
+        
+        Debug.Log("TimeBouncer 게임 종료 처리 완료");
+    }
+    
+    protected override void RestartGameSpecific()
+    {
+        Debug.Log("TimeBouncer 게임 재시작");
+        
+        // Ball 위치 및 속도 리셋
+        ResetBallPosition();
+        
+        // 점수 리셋
+        currentScore = 0;
+        
+        // 충돌 카운터 리셋
+        totalCollisions = 0;
+        
+        // 스코어 시스템 리셋
+        if (scoreManager != null)
+        {
+            scoreManager.ResetScore();
+        }
+        
+        // 타이머 리셋
+        if (timerManager != null)
+        {
+            timerManager.InitializeTimer();
+            timerManager.StartTimer();
+        }
+        
+        // 게임 상태 변경
+        StartGame();
+    }
+    
+    /// <summary>
+    /// TimeBouncer 전용 참조 검증
+    /// </summary>
+    private void ValidateTimBouncerReferences()
+    {
+        if (paddle == null)
+        {
+            Debug.LogError("TimeBouncer: Paddle이 할당되지 않았습니다!");
+            return;
+        }
+        
+        if (ball == null)
+        {
+            Debug.LogError("TimeBouncer: Ball이 할당되지 않았습니다!");
+            return;
+        }
+        
+        Debug.Log("TimeBouncer: 모든 필수 참조가 정상적으로 할당되었습니다.");
+    }
+    
+    /// <summary>
+    /// Ball 설정
+    /// </summary>
+    private void SetupBall()
+    {
+        if (ball == null) return;
+        
+        ballRb = ball.GetComponent<Rigidbody2D>();
+        if (ballRb == null)
+        {
+            ballRb = ball.AddComponent<Rigidbody2D>();
+        }
+        
+        // Ball 물리 설정
+        ballRb.bodyType = RigidbodyType2D.Dynamic;
+        ballRb.linearDamping = 0f;  // 공기저항 없음
+        ballRb.angularDamping = 0f;
+        ballRb.gravityScale = 0f;   // 중력 없음
+        ballRb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        
+        // Collider 설정
+        CircleCollider2D ballCollider = ball.GetComponent<CircleCollider2D>();
+        if (ballCollider == null)
+        {
+            ballCollider = ball.AddComponent<CircleCollider2D>();
+        }
+        
+        // Physics Material 설정
+        PhysicsMaterial2D ballMaterial = Resources.Load<PhysicsMaterial2D>("BallMaterial");
+        if (ballMaterial == null)
+        {
+            ballMaterial = new PhysicsMaterial2D("BallMaterial");
+            ballMaterial.friction = 0f;
+            ballMaterial.bounciness = boundaryBounciness;
+        }
+        ballCollider.sharedMaterial = ballMaterial;
+        
+        // 충돌 헬퍼 추가
+        BallCollisionHandler collisionHandler = ball.GetComponent<BallCollisionHandler>();
+        if (collisionHandler == null)
+        {
+            collisionHandler = ball.AddComponent<BallCollisionHandler>();
+        }
+        collisionHandler.gameManager = this;
+        
+        // 시작 위치 저장
+        ballStartPosition = ball.transform.position;
+        
+        // 경계 처리를 위해 등록
+        RegisterBallForBoundary(ball);
+        
+        // 초기 속도 설정
+        ResetBallPosition();
+        
+        Debug.Log($"Ball 설정 완료 - 초기속도: {ballInitialSpeed}, 범위: {ballMinSpeed}~{ballMaxSpeed}");
+    }
+    
+    /// <summary>
+    /// Paddle 설정
+    /// </summary>
+    private void SetupPaddle()
+    {
+        if (paddle == null) return;
+        
+        paddleRb = paddle.GetComponent<Rigidbody2D>();
+        if (paddleRb == null)
+        {
+            paddleRb = paddle.AddComponent<Rigidbody2D>();
+        }
+        
+        // Paddle을 Kinematic으로 설정 (플레이어가 직접 제어)
+        paddleRb.bodyType = RigidbodyType2D.Kinematic;
+        paddleRb.gravityScale = 0f;
+        
+        // Collider 확인
+        Collider2D paddleCollider = paddle.GetComponent<Collider2D>();
+        if (paddleCollider == null)
+        {
+            BoxCollider2D boxCollider = paddle.AddComponent<BoxCollider2D>();
+            Debug.LogWarning("Paddle에 BoxCollider2D를 자동 추가했습니다.");
+        }
+        
+        Debug.Log("Paddle 설정 완료 - Kinematic 모드");
+    }
+    
+    /// <summary>
+    /// 경계 설정
+    /// </summary>
+    private void SetupBoundary()
+    {
+        if (clockBorder == null) return;
+        
+        borderSetup = clockBorder.GetComponent<ClockBorderColliderSetup>();
+        if (borderSetup == null)
+        {
+            borderSetup = clockBorder.AddComponent<ClockBorderColliderSetup>();
+        }
+        
+        borderSetup.radius = clockRadius;
+        borderSetup.SetupEdgeCollider();
+        
+        Debug.Log($"경계 설정 완료 - 반지름: {clockRadius}");
+    }
+    
+    /// <summary>
+    /// 스코어 시스템 설정
+    /// </summary>
+    private void SetupScoreSystem()
+    {
+        if (!useScoreSystem) return;
+        
+        if (scoreManager == null)
+        {
+            // ScoreManager가 없으면 자동 생성
+            GameObject scoreManagerObj = new GameObject("ScoreManager");
+            scoreManagerObj.transform.SetParent(transform);
+            scoreManager = scoreManagerObj.AddComponent<ScoreManager>();
+        }
+        
+        // 스코어 매니저 설정
+        scoreManager.targetScore = targetScore;
+        
+        // 이벤트 연결
+        if (scoreManager != null)
+        {
+            scoreManager.OnScoreChanged += OnScoreChanged;
+            scoreManager.OnTargetReached += OnTargetScoreReachedFromManager;
+        }
+        
+        Debug.Log($"스코어 시스템 설정 완료 - 목표점수: {targetScore}");
+    }
+    
+    /// <summary>
+    /// 타이머 시스템 설정
+    /// </summary>
+    private void SetupTimerSystem()
+    {
+        if (timerManager == null)
+        {
+            // TimerManager가 없으면 자동 생성
+            GameObject timerManagerObj = new GameObject("TimerManager");
+            timerManagerObj.transform.SetParent(transform);
+            timerManager = timerManagerObj.AddComponent<TimerManager>();
+        }
+        
+        // 타이머 이벤트 연결
+        TimerManager.OnTimeUp += OnTimeUp;
+        TimerManager.OnTimeChanged += OnTimeChanged;
+        
+        Debug.Log("타이머 시스템 설정 완료");
+    }
+    
+    /// <summary>
+    /// 게임 시작
+    /// </summary>
+    public void StartGame()
+    {
+        SetGameState(GameState.Playing);
+        
+        // 타이머 시작
+        if (timerManager != null)
+        {
+            timerManager.StartTimer();
+        }
+        
+        Debug.Log("TimeBouncer 게임 시작!");
+    }
+    
+    /// <summary>
+    /// 게임 상태 변경
+    /// </summary>
+    private void SetGameState(GameState newState)
+    {
+        GameState previousState = currentGameState;
+        currentGameState = newState;
+        
+        Debug.Log($"게임 상태 변경: {previousState} → {newState}");
+        
+        // 상태별 처리
+        switch (newState)
+        {
+            case GameState.Playing:
+                Time.timeScale = 1f;
+                gameActive = true;
+                break;
+                
+            case GameState.Paused:
+                Time.timeScale = 0f;
+                gameActive = false;
+                break;
+                
+            case GameState.GameOver:
+                Time.timeScale = 1f;
+                gameActive = false;
+                break;
+        }
+    }
+    
+    /// <summary>
+    /// Paddle 회전
+    /// </summary>
+    private void RotatePaddle(float input)
+    {
+        if (paddle == null || paddleRb == null) return;
+        
+        // 각속도 계산
+        float targetAngularVelocity = -input * paddleRotationSpeed; // 음수로 올바른 방향
+        paddleRb.angularVelocity = targetAngularVelocity;
+        
+        paddleAngularVelocity = targetAngularVelocity;
+    }
+    
+    /// <summary>
+    /// Ball 속도 유지
+    /// </summary>
+    private void MaintainBallSpeed()
+    {
+        if (ballRb == null) return;
+        
+        Vector2 velocity = ballRb.linearVelocity;
+        float currentSpeed = velocity.magnitude;
+        currentBallSpeed = currentSpeed;
+        
+        // 속도가 너무 낮으면 최소 속도로 증가
+        if (currentSpeed < ballMinSpeed)
+        {
+            if (currentSpeed > 0.1f)
+            {
+                ballRb.linearVelocity = velocity.normalized * ballMinSpeed;
+            }
+            else
+            {
+                // 정지 상태면 랜덤 방향으로 재시작
+                Vector2 randomDirection = Random.insideUnitCircle.normalized;
+                ballRb.linearVelocity = randomDirection * ballMinSpeed;
+            }
+        }
+        // 속도가 너무 높으면 최대 속도로 제한
+        else if (currentSpeed > ballMaxSpeed)
+        {
+            ballRb.linearVelocity = velocity.normalized * ballMaxSpeed;
+        }
+        // 정상 범위에서는 감쇄 적용
+        else if (speedDecayRate > 0f)
+        {
+            float targetSpeed = Mathf.Lerp(currentSpeed, ballMinSpeed, speedDecayRate * Time.deltaTime);
+            ballRb.linearVelocity = velocity.normalized * targetSpeed;
+        }
+    }
+    
+    /// <summary>
+    /// Ball 위치 리셋
+    /// </summary>
+    private void ResetBallPosition()
+    {
+        if (ball == null || ballRb == null) return;
+        
+        // 시작 위치로 이동
+        ball.transform.position = ballStartPosition;
+        
+        // 랜덤 방향으로 초기 속도 설정
+        Vector2 randomDirection = Random.insideUnitCircle.normalized;
+        ballRb.linearVelocity = randomDirection * ballInitialSpeed;
+        ballRb.angularVelocity = 0f;
+        
+        Debug.Log($"Ball 위치 리셋 - 속도: {ballInitialSpeed}, 방향: {randomDirection}");
+    }
+    
+    /// <summary>
+    /// Ball 충돌 처리 (BallCollisionHandler에서 호출)
+    /// </summary>
+    public void OnBallCollision(Collision2D collision)
+    {
+        totalCollisions++;
+        
+        // Paddle과 충돌 시 각속도 전달
+        if (collision.gameObject == paddle && paddleRb != null)
+        {
+            float paddleAngularVel = paddleRb.angularVelocity;
+            if (Mathf.Abs(paddleAngularVel) > 0.1f)
+            {
+                // Paddle의 각속도를 Ball 속도에 반영
+                Vector2 currentVelocity = ballRb.linearVelocity;
+                float speedBoost = Mathf.Abs(paddleAngularVel) * 0.5f;
+                Vector2 newVelocity = currentVelocity.normalized * (currentVelocity.magnitude + speedBoost);
+                
+                // 최대 속도 제한
+                if (newVelocity.magnitude > ballMaxSpeed)
+                {
+                    newVelocity = newVelocity.normalized * ballMaxSpeed;
+                }
+                
+                ballRb.linearVelocity = newVelocity;
+                
+                Debug.Log($"Paddle 충돌 - 각속도: {paddleAngularVel:F1}, 속도증가: {speedBoost:F1}");
+            }
+        }
+        
+        Debug.Log($"Ball 충돌 #{totalCollisions} - 대상: {collision.gameObject.name}");
+    }
+    
+    /// <summary>
+    /// 점수 변경 이벤트 처리
+    /// </summary>
+    private void OnScoreChanged(ScoreEventArgs args)
+    {
+        currentScore = args.totalScore;
+        Debug.Log($"점수 변경: +{args.scoreGained} (총: {currentScore})");
+    }
+    
+    /// <summary>
+    /// ScoreManager의 목표 점수 달성 이벤트 처리
+    /// </summary>
+    private void OnTargetScoreReachedFromManager(int score)
+    {
+        Debug.Log($"ScoreManager에서 목표 점수 달성 알림: {score}");
+        OnTargetScoreReached();
+    }
+    
+    /// <summary>
+    /// 목표 점수 달성 처리
+    /// </summary>
+    protected override void OnTargetScoreReached()
+    {
+        base.OnTargetScoreReached();
+        
+        // 타이머가 있으면 성공 처리
+        if (timerManager != null)
+        {
+            timerManager.ForceGameSuccess();
+        }
+        else
+        {
+            // 타이머가 없으면 바로 게임 종료
+            OnGameEnd();
+        }
+    }
+    
+    /// <summary>
+    /// 시간 종료 처리
+    /// </summary>
+    private void OnTimeUp()
+    {
+        Debug.Log("시간 종료!");
+        OnGameEnd();
+    }
+    
+    /// <summary>
+    /// 시간 변경 처리
+    /// </summary>
+    private void OnTimeChanged(float remainingTime)
+    {
+        this.remainingTime = remainingTime;
+    }
+    
+    /// <summary>
+    /// 게임 종료 처리 (타이머 매니저에서 호출)
+    /// </summary>
+    public void OnGameEnd(bool isSuccess)
+    {
+        Debug.Log($"게임 종료 - 결과: {(isSuccess ? "SUCCESS" : "FAIL")}");
+        OnGameEnd();
+    }
+    
+    /// <summary>
+    /// 일시정지 토글
+    /// </summary>
+    public override void TogglePause()
+    {
+        if (currentGameState == GameState.Playing)
+        {
+            SetGameState(GameState.Paused);
+            
+            // 타이머 일시정지
+            if (timerManager != null)
+            {
+                timerManager.PauseTimer();
+            }
+        }
+        else if (currentGameState == GameState.Paused)
+        {
+            SetGameState(GameState.Playing);
+            
+            // 타이머 재개
+            if (timerManager != null)
+            {
+                timerManager.ResumeTimer();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 디버그 정보 업데이트
+    /// </summary>
+    private void UpdateDebugInfo()
+    {
+        if (ballRb != null)
+        {
+            currentBallSpeed = ballRb.linearVelocity.magnitude;
+        }
+        
+        if (paddleRb != null)
+        {
+            paddleAngularVelocity = paddleRb.angularVelocity;
+        }
+    }
+    
+    /// <summary>
+    /// Gizmo 그리기
+    /// </summary>
+    protected override void OnDrawGizmos()
+    {
+        base.OnDrawGizmos();
+        
+        if (clockCenter == null) return;
+        
+        Vector3 center = clockCenter.position;
+        
+        // Ball 스폰 위치 (빨간색)
+        if (Application.isPlaying && ball != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(ballStartPosition, 5f);
+        }
+        
+        // 스코어 시스템 영역 표시
+        if (scoreManager != null && useScoreSystem)
+        {
+            // 스폰 영역 (초록색)
+            Gizmos.color = Color.green;
+            DrawCircle(center, scoreManager.spawnRadius, 32);
+            
+            // 최소 스폰 거리 (주황색)
+            Gizmos.color = Color.magenta;
+            DrawCircle(center, scoreManager.spawnMinRadius, 16);
+        }
+    }
+    
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        
+        // 이벤트 정리
+        if (scoreManager != null)
+        {
+            scoreManager.OnScoreChanged -= OnScoreChanged;
+            scoreManager.OnTargetReached -= OnTargetScoreReachedFromManager;
+        }
+        
+        TimerManager.OnTimeUp -= OnTimeUp;
+        TimerManager.OnTimeChanged -= OnTimeChanged;
+    }
+    
+    // 공개 프로퍼티
+    public GameState CurrentGameState => currentGameState;
+    public float CurrentBallSpeed => currentBallSpeed;
+    public int TotalCollisions => totalCollisions;
+}

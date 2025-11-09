@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- 액자 외부 프레임 -->
+  <rect x="10" y="10" width="80" height="80" rx="2" ry="2" fill="#ffffff" stroke="#FFD700" stroke-width="2"/>
+  
+  <!-- 액자 내부 프레임 (깊이감) -->
+  <rect x="15" y="15" width="70" height="70" rx="1" ry="1" fill="#ffffff" stroke="#FFD700" stroke-width="1"/>
+  
+  <!-- 사진 영역 (흰색 매트) -->
+  <rect x="20" y="20" width="60" height="60" fill="#ffffff" stroke="#FFD700" stroke-width="1"/>
+  
+  <!-- 실제 사진 영역 -->
+  <rect x="25" y="25" width="50" height="50" fill="#ffffff" stroke="#FFD700" stroke-width="1"/>
+  
+  <!-- 사진 내용 - 간단한 풍경을 노란색 라인으로 -->
+  <!-- 하늘과 땅 구분선 -->
+  <line x1="25" y1="50" x2="75" y2="50" stroke="#FFD700" stroke-width="1"/>
+  
+  <!-- 구름들 -->
+  <path d="M35,35 Q40,30 45,35 Q50,30 55,35 Q50,40 45,35 Q40,40 35,35 Z" fill="none" stroke="#FFD700" stroke-width="1"/>
+  <path d="M55,38 Q60,33 65,38 Q68,33 70,38 Q68,43 65,38 Q60,43 55,38 Z" fill="none" stroke="#FFD700" stroke-width="1"/>
+  
+  <!-- 태양 -->
+  <circle cx="65" cy="32" r="4" fill="none" stroke="#FFD700" stroke-width="1"/>
+  <path d="M65,25 L65,27 M72,32 L70,32 M69,25 L68,26 M69,39 L68,38 M58,32 L60,32 M61,25 L62,26 M61,39 L62,38" stroke="#FFD700" stroke-width="1"/>
+  
+  <!-- 나무 -->
+  <rect x="45" y="60" width="3" height="10" fill="none" stroke="#FFD700" stroke-width="1"/>
+  <ellipse cx="46.5" cy="58" rx="6" ry="8" fill="none" stroke="#FFD700" stroke-width="1"/>
+  
+  <!-- 집 -->
+  <rect x="30" y="58" width="10" height="12" fill="none" stroke="#FFD700" stroke-width="1"/>
+  <polygon points="30,58 35,50 40,58" fill="none" stroke="#FFD700" stroke-width="1"/>
+  <rect x="32" y="63" width="2" height="4" fill="none" stroke="#FFD700" stroke-width="1"/>
+  <rect x="36" y="60" width="2" height="2" fill="none" stroke="#FFD700" stroke-width="1"/>
+  
+  <!-- 액자 모서리 장식 라인 -->
+  <rect x="12" y="12" width="76" height="1" fill="#FFD700"/>
+  <rect x="12" y="12" width="1" height="76" fill="#FFD700"/>
+  <rect x="87" y="12" width="1" height="76" fill="#FFD700"/>
+  <rect x="12" y="87" width="76" height="1" fill="#FFD700"/>
+  
+  <!-- 액자 걸이 고리 -->
+  <rect x="48" y="8" width="4" height="4" rx="2" ry="2" fill="#ffffff" stroke="#FFD700" stroke-width="1"/>
+  <circle cx="50" cy="10" r="1" fill="#FFD700"/>
+  
+  <!-- 그림자 -->
+  <ellipse cx="52" cy="92" rx="35" ry="4" fill="rgba(255,215,0,0.3)"/>
+</svg>

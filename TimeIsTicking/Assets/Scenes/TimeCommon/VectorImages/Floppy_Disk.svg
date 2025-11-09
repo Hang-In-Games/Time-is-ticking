@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- 플로피 디스켓 메인 몸체 -->
+  <rect x="15" y="15" width="70" height="70" rx="3" ry="3" fill="#2c2c2c" stroke="#1a1a1a" stroke-width="2"/>
+  
+  <!-- 상단 슬라이더 개구부 -->
+  <rect x="20" y="20" width="60" height="8" fill="#000000"/>
+  <rect x="22" y="22" width="56" height="4" fill="#333333"/>
+  
+  <!-- 라벨 영역 (흰색) -->
+  <rect x="25" y="35" width="50" height="35" fill="#ffffff" stroke="#cccccc" stroke-width="1"/>
+  
+  <!-- 라벨 텍스트 라인들 -->
+  <rect x="30" y="40" width="30" height="2" fill="#666666"/>
+  <rect x="30" y="45" width="25" height="2" fill="#666666"/>
+  <rect x="30" y="50" width="35" height="2" fill="#666666"/>
+  
+  <!-- 중앙 허브 (금속 부분) -->
+  <circle cx="50" cy="57" r="8" fill="#c0c0c0" stroke="#999999" stroke-width="1"/>
+  <circle cx="50" cy="57" r="3" fill="#808080"/>
+  
+  <!-- 쓰기 방지 탭 -->
+  <rect x="78" y="25" width="4" height="8" fill="#ff4444" stroke="#cc0000" stroke-width="1"/>
+  
+  <!-- 모서리 노치 (우하단) -->
+  <polygon points="75,75 85,75 85,85 75,85" fill="#1a1a1a"/>
+  <polygon points="77,77 83,77 83,83 77,83" fill="#000000"/>
+  
+  <!-- 브랜드 로고 영역 -->
+  <text x="50" y="80" font-family="Arial, sans-serif" font-size="6" text-anchor="middle" fill="#cccccc">3.5"</text>
+  
+  <!-- 디스켓 구멍들 -->
+  <circle cx="35" cy="25" r="1.5" fill="#000000"/>
+  <circle cx="65" cy="25" r="1.5" fill="#000000"/>
+  
+  <!-- 그림자 -->
+  <ellipse cx="52" cy="90" rx="30" ry="4" fill="rgba(0,0,0,0.3)"/>
+</svg>
