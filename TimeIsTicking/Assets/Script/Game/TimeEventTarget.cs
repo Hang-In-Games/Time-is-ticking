@@ -23,8 +23,4 @@ public class TimeEventTarget : MonoBehaviour
       }
    }
 
-   private void OnEnable()
-   {
-      Debug.LogError("shit");
-   }
 }

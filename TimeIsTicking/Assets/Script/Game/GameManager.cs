@@ -121,7 +121,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator WinGameCoroutine()
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(10f);
         SceneManager.LoadScene("Credit");
     }
     IEnumerator EndGameCoroutine()
