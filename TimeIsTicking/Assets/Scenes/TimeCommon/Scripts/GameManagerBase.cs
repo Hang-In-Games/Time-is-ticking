@@ -32,6 +32,13 @@ public abstract class GameManagerBase : MonoBehaviour
     [Tooltip("시계 테두리 반지름")]
     public float clockRadius = 180f;
     
+    [Header("Common Prefab Settings")]
+    [Tooltip("프리팹으로 사용 시 부모 오브젝트 제어 여부")]
+    public bool useParentControl = false;
+    
+    [Tooltip("카메라 자동 설정 사용 여부 (프리팹 사용 시 false 권장)")]
+    public bool useCameraAutoSetup = false;
+    
     [Header("Common UI References")]
     [Tooltip("점수 텍스트")]
     public UnityEngine.UI.Text scoreText;
@@ -87,6 +94,10 @@ public abstract class GameManagerBase : MonoBehaviour
     protected bool gameCompleted = false;  // 게임 완료 플래그
     protected bool gameCleared = false;    // 게임 클리어 플래그 (성공)
     
+    // 게임 종료 상태 관리 (MashButtonMiniGame 패턴 적용)
+    protected bool isRunning = false;      // 게임 진행 중 플래그
+    protected bool hasEnded = false;       // 게임 종료됨 플래그
+    
     // 경계 처리 관련
     protected GameObject ballObject;
     protected Rigidbody2D ballRigidbody;
@@ -116,10 +127,17 @@ public abstract class GameManagerBase : MonoBehaviour
         SetupCamera();
         InitializeTimerSystem();
         InitializeGameSpecific();
+        
+        // 게임 시작
+        isRunning = true;
+        hasEnded = false;
     }
     
     protected virtual void Update()
     {
+        // 게임이 종료되었거나 진행 중이 아니면 업데이트 중단 (MashButtonMiniGame 패턴)
+        if (!isRunning || hasEnded) return;
+        
         if (!gameActive) return;
         
         if (usePlayerInput)
@@ -193,6 +211,13 @@ public abstract class GameManagerBase : MonoBehaviour
     /// </summary>
     protected virtual void SetupCamera()
     {
+        // 프리팹 사용 시 카메라 자동 설정 스킵
+        if (!useCameraAutoSetup)
+        {
+            Debug.Log($"{gameType}: 카메라 자동 설정 비활성화됨 (프리팹 모드)");
+            return;
+        }
+        
         Camera mainCamera = Camera.main;
         if (mainCamera != null && clockCenter != null)
         {
@@ -236,10 +261,13 @@ public abstract class GameManagerBase : MonoBehaviour
     }
     
     /// <summary>
-    /// 타이머 시스템 업데이트
+    /// 타이머 시스템 업데이트 - MashButtonMiniGame 패턴 적용
     /// </summary>
     protected virtual void UpdateTimerSystem()
     {
+        // 게임이 종료되었거나 진행 중이 아니면 타이머 업데이트 중단
+        if (!isRunning || hasEnded) return;
+        
         if (useTimerSystem && timerRunning && !gameCompleted)
         {
             currentTimer -= Time.deltaTime;
@@ -510,30 +538,54 @@ public abstract class GameManagerBase : MonoBehaviour
     }
     
     /// <summary>
-    /// 게임 클리어 처리 (성공)
+    /// 게임 클리어 처리 (성공) - MashButtonMiniGame 패턴 적용
     /// </summary>
     protected virtual void OnGameCleared()
     {
+        // 이미 종료된 경우 중복 처리 방지
+        if (hasEnded) return;
+        
+        hasEnded = true;
+        isRunning = false;
         gameCompleted = true;
         gameCleared = true;
         timerRunning = false;
         gameActive = false;
         
         ShowResult("SUCCESS", "목표를 달성했습니다!");
+        
+        // 프리팹 사용 시 부모 오브젝트 비활성화
+        if (useParentControl && transform.parent != null)
+        {
+            transform.parent.gameObject.SetActive(false);
+        }
+        
         Debug.Log($"{gameType}: 게임 클리어!");
     }
     
     /// <summary>
-    /// 게임 오버 처리 (실패)
+    /// 게임 오버 처리 (실패) - MashButtonMiniGame 패턴 적용
     /// </summary>
     protected virtual void OnGameOver()
     {
+        // 이미 종료된 경우 중복 처리 방지
+        if (hasEnded) return;
+        
+        hasEnded = true;
+        isRunning = false;
         gameCompleted = true;
         gameCleared = false;
         timerRunning = false;
         gameActive = false;
         
         ShowResult("GAME OVER", "시간이 부족합니다!");
+        
+        // 프리팹 사용 시 부모 오브젝트 비활성화
+        if (useParentControl && transform.parent != null)
+        {
+            transform.parent.gameObject.SetActive(false);
+        }
+        
         Debug.Log($"{gameType}: 게임 오버!");
     }
     
@@ -632,11 +684,17 @@ public abstract class GameManagerBase : MonoBehaviour
     }
     
     /// <summary>
-    /// 게임 재시작 (공통 + 게임별)
+    /// 게임 재시작 (공통 + 게임별) - MashButtonMiniGame 패턴 적용
     /// </summary>
     public virtual void RestartGame()
     {
+        // 상태 플래그 리셋
+        isRunning = true;
+        hasEnded = false;
         gameActive = true;
+        gameCompleted = false;
+        gameCleared = false;
+        
         Time.timeScale = 1f;
         currentScore = 0;
         
@@ -648,7 +706,15 @@ public abstract class GameManagerBase : MonoBehaviour
             HideResult();
         }
         
+        // 프리팹 사용 시 부모 오브젝트 활성화
+        if (useParentControl && transform.parent != null)
+        {
+            transform.parent.gameObject.SetActive(true);
+        }
+        
         RestartGameSpecific();
+        
+        Debug.Log($"{gameType}: 게임 재시작 - isRunning={isRunning}, hasEnded={hasEnded}");
     }
     
     /// <summary>
@@ -669,6 +735,38 @@ public abstract class GameManagerBase : MonoBehaviour
         inputActionAsset = asset;
         SetupInputSystem();
         Debug.Log($"{gameType}: Input System 수동 설정 완료: {asset?.name ?? "null"}");
+    }
+    
+    /// <summary>
+    /// 게임 시작 (프리팹으로 사용 시 외부에서 호출) - MashButtonMiniGame 패턴 적용
+    /// </summary>
+    public virtual void StartMiniGame()
+    {
+        // 상태 플래그 리셋
+        isRunning = true;
+        hasEnded = false;
+        gameActive = true;
+        gameCompleted = false;
+        gameCleared = false;
+        
+        Time.timeScale = 1f;
+        currentScore = 0;
+        
+        // 타이머 시스템 리셋
+        if (useTimerSystem)
+        {
+            ResetTimer();
+            StartTimer();
+            HideResult();
+        }
+        
+        // 프리팹 사용 시 부모 오브젝트 활성화
+        if (useParentControl && transform.parent != null)
+        {
+            transform.parent.gameObject.SetActive(true);
+        }
+        
+        Debug.Log($"{gameType}: 미니게임 시작 - isRunning={isRunning}, hasEnded={hasEnded}");
     }
     
 #if UNITY_EDITOR
