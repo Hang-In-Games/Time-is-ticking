@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - NotInteractable
+  - Ball
+  - ClockHand
+  - Paddle
   layers:
   - Default
   - TransparentFX

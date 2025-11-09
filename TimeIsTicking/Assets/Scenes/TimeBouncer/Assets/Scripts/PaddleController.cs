@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// 플레이어가 조종하는 패들(시계 침)
@@ -11,15 +12,21 @@ public class PaddleController : MonoBehaviour
     [Tooltip("회전 속도")]
     public float rotationSpeed = 180f; // 초당 180도
     
-    [Tooltip("키보드 입력 사용 (false면 AI용)")]
-    public bool useKeyboardInput = true;
+    [Tooltip("입력 사용 (false면 AI용)")]
+    public bool usePlayerInput = true;
     
     [Header("References")]
     [Tooltip("회전 중심점 (시계 중심)")]
     public Transform rotationCenter;
     
+    [Header("Input System")]
+    [Tooltip("Input Actions Asset (InputSystem_Actions)")]
+    public InputActionAsset inputActions;
+    
     private Rigidbody2D rb;
     private float currentAngle = 0f;
+    private InputAction moveAction;
+    private Vector2 moveInput;
 
     void Start()
     {
@@ -36,13 +43,74 @@ public class PaddleController : MonoBehaviour
         
         // 현재 각도 초기화
         currentAngle = transform.eulerAngles.z;
+        
+        // Input System 설정
+        if (usePlayerInput)
+        {
+            SetupInputSystem();
+        }
+    }
+
+    void OnEnable()
+    {
+        if (moveAction != null)
+        {
+            moveAction.Enable();
+        }
+    }
+
+    void OnDisable()
+    {
+        if (moveAction != null)
+        {
+            moveAction.Disable();
+        }
+    }
+
+    /// <summary>
+    /// Input System 설정
+    /// </summary>
+    void SetupInputSystem()
+    {
+        // InputActionAsset이 할당되지 않았다면 자동으로 찾기
+        if (inputActions == null)
+        {
+            inputActions = Resources.Load<InputActionAsset>("InputSystem_Actions");
+            
+            if (inputActions == null)
+            {
+                Debug.LogWarning($"{gameObject.name}: InputActionAsset을 찾을 수 없습니다. Inspector에서 할당해주세요.");
+                return;
+            }
+        }
+        
+        // Player 액션맵의 Move 액션 가져오기
+        var actionMap = inputActions.FindActionMap("Player");
+        if (actionMap != null)
+        {
+            moveAction = actionMap.FindAction("Move");
+            
+            if (moveAction != null)
+            {
+                moveAction.Enable();
+                Debug.Log($"{gameObject.name}: Input System 설정 완료!");
+            }
+            else
+            {
+                Debug.LogError($"{gameObject.name}: 'Move' 액션을 찾을 수 없습니다.");
+            }
+        }
+        else
+        {
+            Debug.LogError($"{gameObject.name}: 'Player' 액션맵을 찾을 수 없습니다.");
+        }
     }
 
     void Update()
     {
-        if (useKeyboardInput)
+        if (usePlayerInput && moveAction != null)
         {
-            HandleKeyboardInput();
+            HandlePlayerInput();
         }
     }
 
@@ -53,24 +121,18 @@ public class PaddleController : MonoBehaviour
     }
 
     /// <summary>
-    /// 키보드 입력 처리
+    /// 플레이어 입력 처리 (Input System)
     /// </summary>
-    void HandleKeyboardInput()
+    void HandlePlayerInput()
     {
-        float input = 0f;
+        // Move 액션에서 Vector2 읽기
+        moveInput = moveAction.ReadValue<Vector2>();
         
-        // 방향키 또는 A/D 키
-        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
-        {
-            input = 1f; // 반시계방향
-        }
-        else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
-        {
-            input = -1f; // 시계방향
-        }
+        // X축 입력 사용 (좌: -1, 우: +1)
+        float input = moveInput.x;
         
-        // 각도 업데이트
-        currentAngle += input * rotationSpeed * Time.deltaTime;
+        // 각도 업데이트 (좌: 반시계, 우: 시계)
+        currentAngle += -input * rotationSpeed * Time.deltaTime;
     }
 
     /// <summary>
@@ -124,7 +186,7 @@ public class PaddleController : MonoBehaviour
     // 디버그 정보
     void OnGUI()
     {
-        if (!useKeyboardInput) return;
+        if (!usePlayerInput) return;
         
         GUIStyle style = new GUIStyle();
         style.fontSize = 16;
@@ -132,5 +194,20 @@ public class PaddleController : MonoBehaviour
         
         GUI.Label(new Rect(10, 10, 300, 30), $"각도: {currentAngle:F1}°", style);
         GUI.Label(new Rect(10, 35, 300, 30), "조작: ← → 또는 A D", style);
+        
+        if (moveAction != null)
+        {
+            Vector2 input = moveAction.ReadValue<Vector2>();
+            GUI.Label(new Rect(10, 60, 300, 30), $"입력: {input.x:F2}", style);
+        }
+    }
+    
+    void OnDestroy()
+    {
+        // Input Action 정리
+        if (moveAction != null)
+        {
+            moveAction.Disable();
+        }
     }
 }
