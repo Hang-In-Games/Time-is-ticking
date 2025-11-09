@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- 뒷장 문서 (약간 회전) -->
+  <g transform="translate(5, 5) rotate(5, 50, 50)">
+    <rect x="20" y="15" width="60" height="70" fill="#ffffff" stroke="#FFD700" stroke-width="1"/>
+    <!-- 접힌 모서리 -->
+    <polygon points="70,15 70,25 80,25" fill="#ffffff" stroke="#FFD700" stroke-width="1"/>
+    <!-- 텍스트 라인들 -->
+    <rect x="25" y="25" width="40" height="2" fill="#FFD700"/>
+    <rect x="25" y="30" width="35" height="2" fill="#FFD700"/>
+    <rect x="25" y="35" width="45" height="2" fill="#FFD700"/>
+  </g>
+  
+  <!-- 중간장 문서 (살짝 회전) -->
+  <g transform="translate(2, 2) rotate(2, 50, 50)">
+    <rect x="20" y="15" width="60" height="70" fill="#ffffff" stroke="#FFD700" stroke-width="1"/>
+    <!-- 접힌 모서리 -->
+    <polygon points="70,15 70,25 80,25" fill="#ffffff" stroke="#FFD700" stroke-width="1"/>
+    <!-- 텍스트 라인들 -->
+    <rect x="25" y="25" width="42" height="2" fill="#FFD700"/>
+    <rect x="25" y="30" width="38" height="2" fill="#FFD700"/>
+    <rect x="25" y="35" width="40" height="2" fill="#FFD700"/>
+    <rect x="25" y="40" width="35" height="2" fill="#FFD700"/>
+  </g>
+  
+  <!-- 앞장 문서 (정면) -->
+  <g>
+    <rect x="20" y="15" width="60" height="70" fill="#ffffff" stroke="#FFD700" stroke-width="2"/>
+    <!-- 접힌 모서리 -->
+    <polygon points="70,15 70,25 80,25" fill="#ffffff" stroke="#FFD700" stroke-width="1"/>
+    <line x1="70" y1="25" x2="80" y2="25" stroke="#FFD700" stroke-width="1"/>
+    <line x1="80" y1="15" x2="80" y2="25" stroke="#FFD700" stroke-width="1"/>
+    
+    <!-- 텍스트 라인들 -->
+    <rect x="25" y="25" width="40" height="2" fill="#FFD700"/>
+    <rect x="25" y="30" width="35" height="2" fill="#FFD700"/>
+    <rect x="25" y="35" width="42" height="2" fill="#FFD700"/>
+    <rect x="25" y="40" width="30" height="2" fill="#FFD700"/>
+    <rect x="25" y="45" width="38" height="2" fill="#FFD700"/>
+    
+    <!-- 제목 영역 -->
+    <rect x="25" y="50" width="45" height="8" fill="none" stroke="#FFD700" stroke-width="1" stroke-dasharray="2,2"/>
+    <text x="47" y="56" font-family="Arial, sans-serif" font-size="6" text-anchor="middle" fill="#FFD700">TITLE</text>
+  </g>
+  
+  <!-- 그림자 효과 -->
+  <ellipse cx="52" cy="90" rx="25" ry="3" fill="rgba(255,215,0,0.3)"/>
+</svg>

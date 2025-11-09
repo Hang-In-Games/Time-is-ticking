@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Clock-themed ball - with clock markings -->
+  
+  <!-- Main ball -->
+  <circle 
+    cx="20" 
+    cy="20" 
+    r="18" 
+    fill="white"/>
+  
+  <!-- Outer ring -->
+  <circle 
+    cx="20" 
+    cy="20" 
+    r="18" 
+    fill="none" 
+    stroke="#AAAAAA" 
+    stroke-width="1"/>
+  
+  <!-- 12 o'clock mark -->
+  <line x1="20" y1="4" x2="20" y2="8" stroke="#888888" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- 3 o'clock mark -->
+  <line x1="36" y1="20" x2="32" y2="20" stroke="#888888" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- 6 o'clock mark -->
+  <line x1="20" y1="36" x2="20" y2="32" stroke="#888888" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- 9 o'clock mark -->
+  <line x1="4" y1="20" x2="8" y2="20" stroke="#888888" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Center dot -->
+  <circle 
+    cx="20" 
+    cy="20" 
+    r="2" 
+    fill="#666666"/>
+</svg>

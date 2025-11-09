@@ -8,6 +8,7 @@ TagManager:
   - Ball
   - ClockHand
   - Paddle
+  - ScoreItem
   layers:
   - Default
   - TransparentFX

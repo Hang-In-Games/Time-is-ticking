@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="20" viewBox="0 0 200 20" xmlns="http://www.w3.org/2000/svg">
+  <!-- Clock Paddle (Hand) - White, pivot at left end -->
+  
+  <!-- Main paddle body (long rectangle) -->
+  <rect 
+    x="0" 
+    y="4" 
+    width="180" 
+    height="12" 
+    fill="white" 
+    rx="2"/>
+  
+  <!-- Rounded end cap (right side) -->
+  <circle 
+    cx="180" 
+    cy="10" 
+    r="8" 
+    fill="white"/>
+  
+  <!-- Pivot point indicator (left end - for reference, can remove if not needed) -->
+  <circle 
+    cx="0" 
+    cy="10" 
+    r="6" 
+    fill="white"/>
+</svg>
