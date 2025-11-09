@@ -9,6 +9,7 @@ using TMPro;
 public enum PauseReason
 {
     MiniGame,
+    EndGame,
 }
 
 public class DigitalClock : MonoBehaviour
@@ -48,13 +49,14 @@ public class DigitalClock : MonoBehaviour
         // 시간 흘러감
         elapsedSeconds += Time.deltaTime;
 
+        Debug.LogError($"{elapsedSeconds} / {loopTriggerElapsedTime} / {loopEnabled}");
+
         // 루프 처리 (루프 비활성화 시에는 리셋/OnReset 호출 없음)
         if (elapsedSeconds >= loopTriggerElapsedTime)
         {
             if (loopEnabled)
             {
-                elapsedSeconds = StartElapsedSeconds;
-                loopTriggerElapsedTime = elapsedSeconds + loopDuration;
+                Debug.LogError("shit");
                 OnReset?.Invoke();
             }
             else
@@ -71,6 +73,12 @@ public class DigitalClock : MonoBehaviour
         clockText.text = $"{hours:D2}:{minutes:D2}:{seconds:D2}";
     }
 
+    public void ResetClock()
+    {
+        elapsedSeconds = StartElapsedSeconds;
+        loopTriggerElapsedTime = elapsedSeconds + loopDuration;
+    }
+    
     public void Pause(PauseReason reason)
     {
         pauseReasons.Add(reason);

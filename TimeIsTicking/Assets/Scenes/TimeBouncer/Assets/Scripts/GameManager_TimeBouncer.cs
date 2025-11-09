@@ -323,42 +323,42 @@ public class GameManager_TimeBouncer : MonoBehaviour
     /// </summary>
     void SetupInputSystem()
     {
-        var inputActions = new UnityEngine.InputSystem.InputActionAsset();
-        
-        // InputSystem_Actions 에셋 찾기
-        var existingActions = Resources.LoadAll<UnityEngine.InputSystem.InputActionAsset>("");
-        if (existingActions.Length > 0)
-        {
-            inputActions = existingActions[0];
-        }
-        else
-        {
-            // Assets 폴더에서 찾기
-            string[] guids = UnityEditor.AssetDatabase.FindAssets("InputSystem_Actions t:InputActionAsset");
-            if (guids.Length > 0)
-            {
-                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
-                inputActions = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.InputSystem.InputActionAsset>(path);
-            }
-        }
-        
-        if (inputActions != null)
-        {
-            var playerActionMap = inputActions.FindActionMap("Player");
-            if (playerActionMap != null)
-            {
-                moveAction = playerActionMap.FindAction("Move");
-                if (moveAction != null)
-                {
-                    moveAction.Enable();
-                    Debug.Log("Input System 설정 완료!");
-                }
-            }
-        }
-        else
-        {
-            Debug.LogWarning("InputSystem_Actions를 찾을 수 없습니다. 키보드 입력으로 대체합니다.");
-        }
+        // var inputActions = new UnityEngine.InputSystem.InputActionAsset();
+        //
+        // // InputSystem_Actions 에셋 찾기
+        // var existingActions = Resources.LoadAll<UnityEngine.InputSystem.InputActionAsset>("");
+        // if (existingActions.Length > 0)
+        // {
+        //     inputActions = existingActions[0];
+        // }
+        // else
+        // {
+        //     // Assets 폴더에서 찾기
+        //     string[] guids = UnityEditor.AssetDatabase.FindAssets("InputSystem_Actions t:InputActionAsset");
+        //     if (guids.Length > 0)
+        //     {
+        //         string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
+        //         inputActions = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.InputSystem.InputActionAsset>(path);
+        //     }
+        // }
+        //
+        // if (inputActions != null)
+        // {
+        //     var playerActionMap = inputActions.FindActionMap("Player");
+        //     if (playerActionMap != null)
+        //     {
+        //         moveAction = playerActionMap.FindAction("Move");
+        //         if (moveAction != null)
+        //         {
+        //             moveAction.Enable();
+        //             Debug.Log("Input System 설정 완료!");
+        //         }
+        //     }
+        // }
+        // else
+        // {
+        //     Debug.LogWarning("InputSystem_Actions를 찾을 수 없습니다. 키보드 입력으로 대체합니다.");
+        // }
     }
     
     /// <summary>

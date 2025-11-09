@@ -9,7 +9,8 @@ public class MashButtonMIniGame : MonoBehaviour, IMiniGame
     [SerializeField] private float _initialValue = 20f;
     [SerializeField] private float _increasePerMash = 2f;
     [SerializeField] private float _decreasePerSecond = 2f;
-
+    [SerializeField] private AudioSource _mashSound;
+    
     private bool _isRunning;
     private bool _hasEnded;
 
@@ -60,6 +61,7 @@ public class MashButtonMIniGame : MonoBehaviour, IMiniGame
     {
         if (!_isRunning || _hasEnded) return;
 
+        _mashSound.Play();
         _guage.value = Mathf.Min(_guage.maxValue, _guage.value + _increasePerMash);
 
         if (_guage.value >= _guage.maxValue)

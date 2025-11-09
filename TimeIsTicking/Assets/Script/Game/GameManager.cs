@@ -1,5 +1,6 @@
 // Assets/Script/Game/GameManager.cs
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -15,7 +16,10 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private DigitalClock _clock = null;
     [SerializeField] private TimeEventCollection _timeEventCollection = null;
-
+    [SerializeField] private AudioSource _BGMAudioSource;
+    [SerializeField] private AudioSource _endGameAudioSource;
+    [SerializeField] private GameObject _endGameUI;
+    
     private List<TimeEventTarget> _timeEventTargets = new();
     private IMiniGame _currentMiniGame;
     private Dictionary<GimmickType, bool> _gimmickCleared = new();
@@ -40,8 +44,9 @@ public class GameManager : MonoBehaviour
         if (_clock != null)
             _clock.OnReset += OnTimeReset;
 
+        _BGMAudioSource.Play();
         CollectTimeEventTargets();
-        OnTimeReset();
+        _timeEventCollection?.ResetAllTrigger();
     }
 
     private void OnDestroy()
@@ -94,7 +99,22 @@ public class GameManager : MonoBehaviour
 
     private void OnTimeReset()
     {
+        StartCoroutine(EndGameCoroutine());
         _timeEventCollection?.ResetAllTrigger();
+    }
+    
+    IEnumerator EndGameCoroutine()
+    {
+        _clock.Pause(PauseReason.EndGame);
+        _BGMAudioSource.Stop();
+        _endGameAudioSource.Play();
+        _endGameUI.SetActive(true);
+        yield return new WaitForSeconds(11f);
+        _endGameUI.SetActive(false);
+        _clock.ResetClock();
+        _BGMAudioSource.Play();
+        _endGameAudioSource.Stop();
+        _clock.Resume(PauseReason.EndGame);
     }
 
     // IMiniGame 시작: 시계 일시정지, Init, Start, 종료 시 역순으로 정리
@@ -112,7 +132,8 @@ public class GameManager : MonoBehaviour
 
         // 시계 일시정지 (DigitalClock에 맞는 시그니처 사용)
         _clock?.Pause(PauseReason.MiniGame);
-
+        _BGMAudioSource.Stop();
+        
         _currentMiniGame.Init();
 
         _currentMiniGame.OnMiniGameEnd = (success) =>
@@ -122,6 +143,7 @@ public class GameManager : MonoBehaviour
             
             _currentMiniGame.OnMiniGameEnd = null;
             _clock?.Resume(PauseReason.MiniGame);
+            _BGMAudioSource.Play();
             _currentMiniGame = null;
         };
 
