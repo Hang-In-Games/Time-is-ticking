@@ -10,7 +10,6 @@ public enum GimmickType
 {
     MashMiniGame,
     TimeBouncer,
-    TimeSeeker,
 }
 public class GameManager : MonoBehaviour
 {
@@ -21,6 +20,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private AudioSource _BGMAudioSource;
     [SerializeField] private AudioSource _endGameAudioSource;
     [SerializeField] private GameObject _endGameUI;
+    [SerializeField] private Animation _endGameAnimation;
     
     private List<TimeEventTarget> _timeEventTargets = new();
     private IMiniGame _currentMiniGame;
@@ -44,7 +44,10 @@ public class GameManager : MonoBehaviour
 
 
         if (_clock != null)
+        {
             _clock.OnReset += OnTimeReset;
+            _clock.OnClear += OnClear;
+        }
 
         _BGMAudioSource.Play();
         CollectTimeEventTargets();
@@ -55,7 +58,10 @@ public class GameManager : MonoBehaviour
     {
         if (Instance == this) Instance = null;
         if (_clock != null)
+        {
             _clock.OnReset -= OnTimeReset;
+            _clock.OnClear -= OnClear;
+        }
     }
 
     private void CollectTimeEventTargets()
@@ -105,6 +111,19 @@ public class GameManager : MonoBehaviour
         _timeEventCollection?.ResetAllTrigger();
     }
     
+    private void OnClear()
+    {
+        _endGameAnimation.Play();
+        StartCoroutine(WinGameCoroutine());
+        //SceneManager.LoadScene("");
+        // 타임루프 클리어 시 처리 (필요시 구현)
+    }
+
+    private IEnumerator WinGameCoroutine()
+    {
+        yield return new WaitForSeconds(5f);
+        SceneManager.LoadScene("Credit");
+    }
     IEnumerator EndGameCoroutine()
     {
         _clock.Pause(PauseReason.EndGame);

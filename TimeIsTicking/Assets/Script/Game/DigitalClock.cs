@@ -61,6 +61,8 @@ public class DigitalClock : MonoBehaviour
             {
                 // 루프 비활성화 상태면 더 이상 트리거되지 않도록 큰 값 설정
                 loopTriggerElapsedTime = float.PositiveInfinity;
+                Pause(PauseReason.EndGame);
+                
                 OnClear?.Invoke();
             }
         }
